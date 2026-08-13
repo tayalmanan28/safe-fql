@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Safe Flow Q-Learning (SafeFQL): offline safe reinforcement learning that combines a Hamilton-Jacobi reachability-based safety critic with a distilled one-step flow policy, for real-time safe control without rejection sampling.">
+  <meta name="keywords" content="Safety, Safe Offline Reinforcement Learning, Flow Policies, Hamilton-Jacobi Reachability, Safe Control, Safety Value Function">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Safe FQL</title>
+
+  <meta property="og:title" content="Safe Flow Q-Learning: Offline Safe RL with Reachability-Based Flow Policies">
+  <meta property="og:description" content="SafeFQL pairs a reachability-based safety critic with a one-step flow policy: near-zero constraint violations at 2.5x lower inference latency, with no rejection sampling.">
+  <meta property="og:image" content="./images/Algorithm_SafeFQL.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/iisc_logo.png">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      jax: ["input/TeX", "output/HTML-CSS"],
+      extensions: ["tex2jax.js"],
+      "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"], scale: 95 },
+      tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+      TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+      messageStyle: "none"
+    });
+  </script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+
+  <style>
+    body { font-family: 'Noto Sans', sans-serif; }
+    .publication-title, .title, h1, h2, h3 { font-family: 'Google Sans', sans-serif; }
+
+    /* ---- narrow, readable content column ---- */
+    .paper-body { max-width: 800px; margin: 0 auto; }
+    .paper-body p { font-size: 1.05rem; line-height: 1.7; text-align: justify; margin-bottom: 1.1em; }
+    .paper-body ul { margin-top: 0.4em; }
+    .paper-body li { font-size: 1.05rem; line-height: 1.7; margin-bottom: 0.55em; }
+
+    section.section { padding: 2.2rem 1.5rem; }
+    .section-title { font-size: 1.9rem !important; margin-bottom: 1.2rem !important; }
+    .section-title::after {
+      content: ""; display: block; width: 46px; height: 3px;
+      background: #f0a202; margin-top: 0.45rem; border-radius: 2px;
+    }
+    .subsection-title { font-size: 1.2rem !important; font-weight: 700; margin: 1.8rem 0 0.6rem 0; color: #363636; }
+
+    /* ---- header ---- */
+    .venue-badge {
+      display: inline-block; margin: 0.4rem 0 1.1rem 0; padding: 0.35em 0.9em;
+      border: 1.5px solid #f0a202; border-radius: 999px; color: #b87400;
+      font-weight: 600; font-size: 0.95rem;
+    }
+    .venue-badge a { color: inherit; }
+    .publication-links .link-block { display: inline-block; margin: 0.2rem 0.15rem; }
+
+    /* ---- TL;DR box ---- */
+    .tldr {
+      background: #fffaf0; border-left: 4px solid #f0a202;
+      border-radius: 6px; padding: 1.1rem 1.4rem 0.9rem 1.4rem; margin-bottom: 1.4rem;
+    }
+    .tldr ul { margin-left: 1.1rem; }
+    .tldr li::marker { color: #f0a202; }
+
+    /* ---- figures ---- */
+    figure.fig { margin: 1.6rem 0 1.2rem 0; }
+    figure.fig img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+    figure.fig figcaption {
+      font-size: 0.92rem; color: #5a5a5a; line-height: 1.55;
+      margin-top: 0.85rem; text-align: justify;
+    }
+    figure.fig figcaption b { color: #363636; }
+
+    /* ---- collapsible ---- */
+    details.more {
+      border: 1px solid #e3e3e3; border-radius: 6px; padding: 0.7rem 1rem;
+      margin: 1.2rem 0; background: #fbfbfb;
+    }
+    details.more > summary {
+      cursor: pointer; font-weight: 600; color: #b87400; list-style: none; outline: none;
+    }
+    details.more > summary::-webkit-details-marker { display: none; }
+    details.more > summary::before { content: "\25B8  "; }
+    details[open].more > summary::before { content: "\25BE  "; }
+    details.more[open] > summary { margin-bottom: 0.8rem; }
+
+    /* ---- misc ---- */
+    .hl-safe { color: #158f6f; font-weight: 600; }
+    .hl-unsafe { color: #8e2b6b; font-weight: 600; }
+    .stat-grid { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.4rem 0; }
+    .stat-card {
+      flex: 1 1 210px; background: #fff; border: 1px solid #ececec; border-radius: 8px;
+      padding: 1rem 1.1rem; text-align: center;
+    }
+    .stat-card .stat-num { font-size: 1.9rem; font-weight: 700; color: #f0a202; line-height: 1.15; font-family: 'Google Sans', sans-serif; }
+    .stat-card .stat-lbl { font-size: 0.9rem; color: #5a5a5a; margin-top: 0.3rem; line-height: 1.4; }
+
+    pre code { font-size: 0.85rem; }
+    @media screen and (max-width: 600px) {
+      .paper-body p, .paper-body li { font-size: 1rem; text-align: left; }
+      .section-title { font-size: 1.55rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== TITLE ==================== -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title" style="font-size: 2.5rem;">
+              Safe Flow Q-Learning
+            </h1>
+            <p class="is-size-5" style="color:#4a4a4a; margin-bottom: 1.2rem;">
+              Offline Safe Reinforcement Learning with Reachability-Based Flow Policies
+            </p>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://mumukshtayal.github.io/">Mumuksh Tayal</a><sup>*</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://tayalmanan28.github.io/">Manan Tayal</a><sup>*</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://ravipr009.github.io/">Ravi Prakash</a>
+              </span>
+            </div>
+
+            <div class="is-size-6 publication-authors" style="margin-top: 0.5rem;">
+              <span class="author-block">Indian Institute of Science (IISc), India</span><br>
+              <span class="author-block" style="color:#7a7a7a;"><sup>*</sup> denotes equal contribution</span>
+            </div>
+
+            <div class="venue-badge">
+              <a href="https://rlj.cs.umass.edu/2026/papers/Paper82.html">3rd Reinforcement Learning Conference (RLC), 2026</a>
+            </div>
+
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://rlj.cs.umass.edu/2026/papers/Paper82.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2603.15136"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://openreview.net/forum?id=TMfub7apzD"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <img src="https://openreview.net/favicon.ico" alt="OpenReview"
+                         style="width:1em; height:1em; vertical-align:middle;">
+                  </span>
+                  <span>OpenReview</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/tayalmanan28/safe-fql"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-quote-left"></i></span>
+                  <span>BibTeX</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TEASER ==================== -->
+  <section class="section" style="padding-top: 0;">
+    <div class="paper-body">
+      <figure class="fig">
+        <img src="./images/Algorithm_SafeFQL.jpg" alt="SafeFQL framework overview">
+        <figcaption>
+          <b>SafeFQL in one picture.</b> A multi-step flow-matching policy is trained on offline data by
+          behavioral cloning and distilled into a <b>one-step actor</b>. A reward critic $Q_r$ and a
+          reachability-based safety critic $Q_c$ then gate that actor: when the predicted action is
+          <span class="hl-safe">feasible</span> the update maximizes reward, when it is
+          <span class="hl-unsafe">infeasible</span> the update recovers feasibility. At deployment only the
+          one-step actor runs &mdash; a single forward pass, no ODE integration, no rejection sampling.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ==================== OVERVIEW ==================== -->
+  <section class="section" style="padding-top: 0;">
+    <div class="paper-body">
+      <h2 class="title section-title">Overview</h2>
+      <div class="tldr">
+        <ul>
+          <li><b>Hard safety, not soft cost.</b> SafeFQL replaces expected-cost budgets with a
+              Hamilton&ndash;Jacobi reachability-style safety critic trained by a <i>max-backup</i> Bellman
+              recursion, so its sign tells you whether a state&ndash;action pair is <i>feasible</i> for all future time.</li>
+          <li><b>Expressive policies without iterative inference.</b> A flow-matching behavior teacher is
+              distilled into a one-step actor, so the deployed policy is a single network forward pass &mdash;
+              no denoising loop and no rejection sampling.</li>
+          <li><b>A feasibility gate instead of a Lagrangian.</b> Reward and safety never fight each other in
+              the actor loss: an exclusive gate switches between reward maximization and feasibility recovery,
+              removing the multiplier that soft-constraint methods must hand-tune per task.</li>
+        </ul>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">0.14s</div>
+          <div class="stat-lbl">inference per episode<br>(vs. 0.35s for flow/diffusion baselines)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">2.5&times;</div>
+          <div class="stat-lbl">inference speedup over<br>generative safe-RL baselines</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">N = 1</div>
+          <div class="stat-lbl">action samples needed for<br>100% safety rate on boat navigation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CHALLENGE ==================== -->
+  <section class="section" style="background-color: #fafafa;">
+    <div class="paper-body">
+      <h2 class="title section-title">Challenge</h2>
+
+      <p>
+        Offline safe RL asks for a reward-maximizing policy from a fixed dataset
+        $\mathcal{D} = \{(x_t, a_t, r_t, \ell_t, x_{t+1})\}$, under a constraint that must hold at
+        <i>every</i> timestep. With a failure set $\mathcal{F} = \{x : \ell(x) > 0\}$, the objective is
+      </p>
+      $$
+      \sup_{\pi}\ \Big[\sum_{k=0}^{\infty} \gamma^k r(x_k)\ \Big|\ x_0 = x\Big]
+      \qquad \text{s.t.}\quad x_t \notin \mathcal{F},\ \ \forall t \ge 0 .
+      $$
+      <p>
+        This is a <b>state-wise hard constraint</b>, and two standard families of methods struggle with it for
+        different reasons.
+      </p>
+
+      <p>
+        <b>Soft-cost methods lose the guarantee.</b> Lagrangian and cost-budget approaches (CPQ, COptiDICE,
+        C2IQL, BEAR-Lag) constrain $\mathbb{E}[\sum_t \gamma^t c(x_t)] \le l$. Satisfying a constraint
+        <i>in expectation</i> is not the same as never entering $\mathcal{F}$, the threshold $l$ becomes a
+        per-task hyperparameter, and safety-critical transitions are rare in static datasets &mdash; exactly
+        where the reward/safety trade-off is most brittle.
+      </p>
+
+      <p>
+        <b>Generative safe policies pay for it at inference.</b> Diffusion- and flow-based policies (FISOR,
+        SafeIFQL) capture multimodal behavior well, but sampling costs $O(T)$ network evaluations per action,
+        and in practice they need <b>rejection sampling</b> over $N$ candidates to reliably land on a safe,
+        high-value action. That is $O(NT)$ forward passes inside a real-time control loop. Training a flow
+        policy with RL directly is not a fix either: it requires backpropagating through the entire iterative
+        generation process.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== IDEA ==================== -->
+  <section class="section">
+    <div class="paper-body">
+      <h2 class="title section-title">Idea</h2>
+
+      <p>
+        SafeFQL keeps the decoupling principle of <a href="https://seohong.me/projects/fql/">Flow Q-Learning</a>
+        &mdash; critics, behavior model, and deployed actor each trained by their own objective &mdash; and
+        extends it with a second critic whose semantics are governed by <i>worst-case reachability</i> rather
+        than cumulative discounted cost.
+      </p>
+
+      <h3 class="subsection-title">1. A safety critic with a meaningful sign</h3>
+      <p>
+        Instead of a cumulative cost Q-function, $Q_c$ approximates the Hamilton&ndash;Jacobi feasibility value
+        $V^*_\ell(x_0) = \min_\pi \max_{t \ge 0} \ell(x_t)$ through a <b>max-backup</b> Bellman recursion:
+      </p>
+      $$ y_c(x, a, x') = \max\big\{\, \ell(x),\ \gamma\, \bar V_c(x') \,\big\}. $$
+      <p>
+        Taking the maximum &mdash; rather than a sum &mdash; propagates the worst safety margin at <i>any</i>
+        future time backwards to the present. So $Q_c(x,a) < 0$ means not just "$x$ is safe now" but "the
+        predicted future evolution stays safe too", and $Q_c(x,a) \ge 0$ predicts eventual entry into
+        $\mathcal{F}$. Because the backup is a max, pessimism has to be applied consistently: SafeFQL uses two
+        safety Q-networks and takes $\bar V_c(x') = \max\{Q_c^{(1)}, Q_c^{(2)}\}$, avoiding overoptimistic
+        feasibility estimates at out-of-distribution next states.
+      </p>
+
+      <h3 class="subsection-title">2. Expressiveness from a teacher, speed from a student</h3>
+      <p>
+        A conditional flow-matching model $\mu_\theta$ is trained purely by behavioral cloning &mdash; no critic
+        signal enters its loss, which keeps that stage unconditionally stable. A deterministic one-step actor
+        $\mu_\omega(x, z)$ is then distilled from it,
+        $\mathcal{L}_{\text{distill}}(\omega) = \mathbb{E}\big[\|\mu_\omega(x,z) - \bar\mu_\theta(x,z)\|_2^2\big]$,
+        which doubles as a behavior regularizer anchoring the actor to the dataset support. The one-step actor
+        is the <i>only</i> component queried at deployment.
+      </p>
+
+      <h3 class="subsection-title">3. A gate, not a trade-off</h3>
+      <p>
+        The natural baseline adds a Lagrangian penalty, $-Q_r + \eta \max(0, Q_c)$. The two terms are
+        commensurate in magnitude, so near the feasibility boundary a large reward gradient can simply outvote
+        the safety term &mdash; and the right $\eta$ is not knowable without online interaction. SafeFQL instead
+        enforces strict priority with a binary gate $\zeta(x,z) = \mathbb{I}\{Q_c(x, \mu_\omega(x,z)) < 0\}$:
+      </p>
+      $$
+      \mathcal{L}_{\text{actor}}(\omega) = \lambda \mathcal{L}_{\text{distill}}(\omega)
+      + \mathbb{E}_{(x,z)}\Big[\underbrace{\zeta \cdot \big(-Q_r(x, a_\omega)\big)}_{\text{feasible: maximize reward}}
+      + \underbrace{(1-\zeta) \cdot \max\big(0, Q_c(x, a_\omega)\big)}_{\text{infeasible: recover feasibility}}\Big].
+      $$
+      <p>
+        The two objectives are mutually exclusive by construction, so reward and safety gradients are never
+        active in opposing directions at the same state. The distillation term stays on in both regimes as a
+        universal behavioral anchor.
+      </p>
+
+      <details class="more">
+        <summary>Click to see the full algorithm</summary>
+        <p>
+          Training runs in three sequentially dependent phases; within each phase all networks train in
+          parallel to convergence.
+        </p>
+        <p>
+          <b>Phase 1 &mdash; Critic learning.</b> Reward critics $(Q_r, V_r)$ follow IQL: $V_r$ is fit with the
+          expectile loss $\mathcal{L}_\tau(u) = |\tau - \mathbb{I}(u<0)|u^2$ against in-sample Q-values, and
+          $Q_r$ regresses onto $y_r = r + \gamma \bar V_r(x')$. The safety pair $(Q_c, V_c)$ uses the same
+          expectile machinery on the safety residual, but with $\tau < 0.5$ so $V_c$ tracks the <i>lower</i>
+          quantile &mdash; a conservative approximation of the feasibility boundary &mdash; and with the
+          max-backup target $y_c$ above. Target networks are updated by EMA. All critic learning stays inside
+          the support of $\mathcal{D}$, so no out-of-distribution action queries are needed.
+        </p>
+        <p>
+          <b>Phase 2 &mdash; Flow teacher.</b> Given $x \sim \mathcal{D}$, $z \sim \mathcal{N}(0,I)$,
+          $t \sim \mathcal{U}[0,1]$ and the straight-line interpolant $x_t = (1-t)z + ta$, the velocity field is
+          trained by regression:
+          $\mathcal{L}_{\text{flow}}(\theta) = \mathbb{E}\big[\|\mu_\theta(x, x_t, t) - (a - z)\|_2^2\big]$.
+        </p>
+        <p>
+          <b>Phase 3 &mdash; Feasibility-gated actor.</b> Each step samples $(x, z) \sim \mathcal{D} \times
+          \mathcal{N}(0,I)$, computes $a_\omega = \mu_\omega(x,z)$, evaluates the gate $\zeta$, and minimizes
+          $\mathcal{L}_{\text{actor}}$. A fresh $z$ per step gives the induced stochastic policy $\pi_\omega$
+          coverage of the action distribution, avoiding mode collapse under the distillation constraint &mdash;
+          no replay buffer of policy actions is required.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ==================== EXPERIMENTS ==================== -->
+  <section class="section" style="background-color: #fafafa;">
+    <div class="paper-body">
+      <h2 class="title section-title">Experiments</h2>
+
+      <h3 class="subsection-title">Tasks and baselines</h3>
+      <p>
+        <b>Safe Boat Navigation</b> is a custom 2D collision-avoidance task: a point-mass boat crosses a river
+        whose drift velocity varies with the $y$-coordinate, and must bypass obstacles despite that drift.
+        <b>Safety Gymnasium</b> covers the Safe Velocity suite on Hopper, HalfCheetah, Swimmer, Walker2D and
+        Ant, where the agent maximizes reward while holding its speed below a threshold; these use the standard
+        DSRL datasets. Every method is evaluated from a fixed set of 500 randomly sampled safe initial states
+        per environment, across 5 seeds.
+      </p>
+      <p>
+        Baselines span both families discussed above: constrained offline RL (<b>BEAR-Lag</b>, <b>CPQ</b>,
+        <b>COptiDICE</b>, <b>C2IQL</b>) and safe generative policies (<b>FISOR</b>, <b>SafeIFQL</b>), the latter
+        evaluated with rejection sampling at $N = 16$.
+      </p>
+
+      <h3 class="subsection-title">Safety and reward</h3>
+      <figure class="fig">
+        <img src="./images/fig_results.png" alt="Reward and cost across six environments for all methods">
+        <figcaption>
+          <b>Evaluation results</b> (mean $\pm$ std dev over 5 seeds). SafeFQL attains the lowest cost in every
+          environment while keeping the highest reward among methods with comparable cost. Methods marked
+          <i>(R.S.)</i> use rejection sampling with $N = 16$ at evaluation time; SafeFQL does not.
+        </figcaption>
+      </figure>
+      <p>
+        On Safe Boat Navigation, SafeFQL improves reward over all baselines while maintaining <b>zero
+        violations</b> across evaluation episodes. The pattern holds on the high-dimensional Safety Gymnasium
+        tasks: near-zero cost with reward competitive against methods that achieve it only by violating
+        constraints. Expected-cost baselines split into two failure modes &mdash; BEAR-Lag, CPQ and COptiDICE
+        sacrifice reward without strictly enforcing safety, while C2IQL earns high reward at inconsistent cost.
+      </p>
+
+      <h3 class="subsection-title">How many action samples do you need?</h3>
+      <figure class="fig">
+        <img src="./images/fig_safety_rate.png" alt="Safety rate versus rejection sampling budget N">
+        <figcaption>
+          <b>Action sampling efficiency</b> on Safe Boat Navigation. FISOR and SafeIFQL need a large candidate
+          budget before their safety rate approaches SafeFQL's; SafeFQL reaches 100% at $N = 1$, because the
+          feasibility gate is baked into the actor rather than applied as a test-time filter.
+        </figcaption>
+      </figure>
+      <p>
+        This is the practical consequence of the design: FISOR and SafeIFQL do account for worst-case safety,
+        but they never learn a single optimal action &mdash; they generate candidates and filter. SafeFQL emits
+        the action directly.
+      </p>
+
+      <h3 class="subsection-title">What does it cost?</h3>
+      <figure class="fig">
+        <img src="./images/fig_compute.png" alt="Training and inference compute time comparison">
+        <figcaption>
+          <b>Computation time</b> (mean $\pm$ std dev over 5 runs). SafeFQL trains longer &mdash; 128s vs. 113s
+          (FISOR) and 64s (SafeIFQL) &mdash; and recovers that cost immediately at deployment: 0.14s per episode
+          against 0.33&ndash;0.35s for the baselines at their working $N$.
+        </figcaption>
+      </figure>
+      <p>
+        Even at $N = 1$, FISOR and SafeIFQL remain at 0.21&ndash;0.24s, because the multi-step denoising or
+        integration process persists whether or not rejection sampling is enabled. SafeFQL's one-time training
+        overhead buys a policy that fits inside a high-frequency real-time control loop.
+      </p>
+
+      <h3 class="subsection-title">Limitations</h3>
+      <p>
+        The gate $\zeta$ is a hard indicator over the safety critic, which can in principle produce a non-smooth
+        loss landscape and occasionally affect training stability. Continuous masking functions or soft
+        Lagrangian relaxations are a natural refinement, at the cost of reintroducing hyperparameters that need
+        tuning. SafeFQL is evaluated in the offline setting and does not claim online-training safety guarantees.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== BIBTEX ==================== -->
+  <section class="section" id="BibTeX">
+    <div class="paper-body">
+      <h2 class="title section-title">Citation</h2>
+      <pre><code>@article{tayal2026safe,
+    title={Safe Flow Q-Learning: Offline Safe Reinforcement Learning
+           with Reachability-Based Flow Policies},
+    author={Mumuksh Tayal and Manan Tayal and Ravi Prakash},
+    journal={Reinforcement Learning Journal},
+    volume={7},
+    year={2026}
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" style="padding: 2rem 1.5rem 3rem 1.5rem;">
+    <div class="container">
+      <div class="content has-text-centered">
+        <a class="icon-link" href="https://rlj.cs.umass.edu/2026/papers/Paper82.pdf" title="Paper">
+          <i class="fas fa-file-pdf"></i>
+        </a>
+        <a class="icon-link" href="https://arxiv.org/abs/2603.15136" title="arXiv">
+          <i class="ai ai-arxiv"></i>
+        </a>
+        <a class="icon-link" href="https://github.com/tayalmanan28/safe-fql" title="Code">
+          <i class="fab fa-github"></i>
+        </a>
+        <p style="font-size: 0.85rem; color: #7a7a7a; margin-top: 1rem;">
+          Website template adapted from
+          <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
