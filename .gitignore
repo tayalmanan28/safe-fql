@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# huge file
+
+# log
+wandb/
+trajectory_cache/
+result_plots/
+results/
+training_time_results/
+logs/
+.vscode
+.claude
+*.hdf5
