@@ -1,11 +1,11 @@
 # Safe Flow Q-Learning: Offline Safe Reinforcement Learning with Reachability-Based Flow Policies
 Reinforcement Learning Conference (RLC), 2026
 
-[**[Arxiv]**](https://arxiv.org/abs/2603.15136)
-
 Mumuksh Tayal\*, Manan Tayal\*, Ravi Prakash
 
 \*Equal contribution
+
+[**[Paper]**](https://rlj.cs.umass.edu/2026/papers/Paper82.html)  [**[Project Page]**](https://tayalmanan28.github.io/safe-fql/)
 
 SafeFQL tackles offline safe reinforcement learning by combining a Hamilton-Jacobi reachability-inspired safety value function with an efficient one-step flow policy. Safety constraints are learned through a self-consistent Bellman recursion, policies are trained via behavioral cloning, and the resulting policy is distilled for immediate deployment without rejection sampling. Compared to diffusion-style safe generative baselines, SafeFQL achieves substantially lower inference latency while matching or exceeding their performance, reducing constraint violations across navigation and robotics tasks.
 
@@ -52,19 +52,27 @@ bash scripts/sweep_alpha_remaining_mujoco.sh  # alpha sweep for remaining MuJoCo
 bash scripts/benchmark_training_time.sh       # training-time benchmark on BoatRobot
 ```
 
+## Tips for hyperparameter tuning
+Here are some general tips for FQL's hyperparameter tuning for new tasks:
+* The most important hyperparameter of FQL is the BC coefficient (`--agent.alpha`).
+  This needs to be individually tuned for each environment.
+* Tuning `alpha` starting from `[0.03, 0.1, 0.3, 1, 3, 10]`.
+* For other hyperparameters, you may use the default values in `normalized_safefql` config.
+
 ## Bibtex
 
 If you find our code and paper helpful, please cite our paper as:
 ```
-@inproceedings{tayal2026safefql,
-title={Safe Flow Q-Learning: Offline Safe Reinforcement Learning with Reachability-Based Flow Policies},
-author={Tayal, Mumuksh and Tayal, Manan and Prakash, Ravi},
-booktitle={Reinforcement Learning Conference (RLC)},
-year={2026},
-url={https://arxiv.org/abs/2603.15136}
+@article{tayal2026safe,
+    title={Safe Flow Q-Learning: Offline Safe Reinforcement Learning
+           with Reachability-Based Flow Policies},
+    author={Mumuksh Tayal and Manan Tayal and Ravi Prakash},
+    journal={Reinforcement Learning Journal},
+    volume={7},
+    year={2026}
 }
 ```
 
 ## Acknowledgements
 
-This codebase builds on [FISOR](https://github.com/ZhengYinan-AIR/FISOR), and parts of its code are adapted from [IDQL](https://github.com/philippe-eecs/IDQL) and [DRPO](https://github.com/ManUtdMoon/Distributional-Reachability-Policy-Optimization).
+This codebase builds on [FQL](https://github.com/seohongpark/fql), [FISOR](https://github.com/ZhengYinan-AIR/FISOR) and parts of its code are adapted from [IDQL](https://github.com/philippe-eecs/IDQL) and [DRPO](https://github.com/ManUtdMoon/Distributional-Reachability-Policy-Optimization).
