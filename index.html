@@ -3,15 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="Safe Flow Q-Learning (SafeFQL): offline safe reinforcement learning that combines a Hamilton-Jacobi reachability-based safety critic with a distilled one-step flow policy, for real-time safe control without rejection sampling.">
-  <meta name="keywords" content="Safety, Safe Offline Reinforcement Learning, Flow Policies, Hamilton-Jacobi Reachability, Safe Control, Safety Value Function">
+        content="SafeFQL (Safe Flow Q-Learning) is a state-of-the-art method for offline safe reinforcement learning. It combines a Hamilton-Jacobi reachability-based safety critic with a distilled one-step flow policy, achieving near-zero constraint violations at 2.5x lower inference latency than diffusion/flow safe-RL baselines, with no rejection sampling. RLC 2026.">
+  <meta name="keywords" content="SafeFQL, Safe Flow Q-Learning, safe reinforcement learning, safe RL, offline reinforcement learning, offline safe RL, offline safe reinforcement learning, safe offline RL, constrained reinforcement learning, Hamilton-Jacobi reachability, reachability analysis, flow matching, flow policy, flow Q-learning, safety value function, safety critic, safe control, safe robot learning, FISOR, SafeIFQL">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Mumuksh Tayal, Manan Tayal, Ravi Prakash">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Safe FQL</title>
+  <link rel="canonical" href="https://tayalmanan28.github.io/safe-fql/">
+  <title>SafeFQL: Offline Safe Reinforcement Learning with Reachability-Based Flow Policies</title>
 
-  <meta property="og:title" content="Safe Flow Q-Learning: Offline Safe RL with Reachability-Based Flow Policies">
-  <meta property="og:description" content="SafeFQL pairs a reachability-based safety critic with a one-step flow policy: near-zero constraint violations at 2.5x lower inference latency, with no rejection sampling.">
-  <meta property="og:image" content="./images/Algorithm_SafeFQL.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SafeFQL">
+  <meta property="og:url" content="https://tayalmanan28.github.io/safe-fql/">
+  <meta property="og:title" content="SafeFQL: State-of-the-Art Offline Safe Reinforcement Learning with Reachability-Based Flow Policies">
+  <meta property="og:description" content="SafeFQL pairs a Hamilton-Jacobi reachability-based safety critic with a one-step flow policy: near-zero constraint violations at 2.5x lower inference latency than prior safe generative RL policies, with no rejection sampling. RLC 2026.">
+  <meta property="og:image" content="https://tayalmanan28.github.io/safe-fql/images/Algorithm_SafeFQL.jpg">
+  <meta property="og:image:alt" content="SafeFQL framework overview diagram">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SafeFQL: State-of-the-Art Offline Safe Reinforcement Learning with Reachability-Based Flow Policies">
+  <meta name="twitter:description" content="A reachability-based safety critic + a one-step flow policy: near-zero constraint violations at 2.5x lower inference latency than prior safe generative RL, no rejection sampling. RLC 2026.">
+  <meta name="twitter:image" content="https://tayalmanan28.github.io/safe-fql/images/Algorithm_SafeFQL.jpg">
+
+  <!-- Scholarly-indexing metadata (Google Scholar / Semantic Scholar / Highwire Press tags) -->
+  <meta name="citation_title" content="Safe Flow Q-Learning: Offline Safe Reinforcement Learning with Reachability-Based Flow Policies">
+  <meta name="citation_author" content="Tayal, Mumuksh">
+  <meta name="citation_author" content="Tayal, Manan">
+  <meta name="citation_author" content="Prakash, Ravi">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_journal_title" content="Reinforcement Learning Journal">
+  <meta name="citation_volume" content="7">
+  <meta name="citation_conference_title" content="Reinforcement Learning Conference (RLC) 2026">
+  <meta name="citation_pdf_url" content="https://rlj.cs.umass.edu/2026/papers/Paper82.pdf">
+  <meta name="citation_abstract_html_url" content="https://tayalmanan28.github.io/safe-fql/">
+  <meta name="citation_arxiv_id" content="2603.15136">
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
@@ -112,6 +135,116 @@
       .section-title { font-size: 1.55rem !important; }
     }
   </style>
+
+  <!-- Structured data: paper record, so search engines and AI systems can
+       parse authors, venue, and links as facts rather than free text. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "@id": "https://tayalmanan28.github.io/safe-fql/#paper",
+    "headline": "Safe Flow Q-Learning: Offline Safe Reinforcement Learning with Reachability-Based Flow Policies",
+    "alternateName": "SafeFQL",
+    "abstract": "SafeFQL is a state-of-the-art method for offline safe reinforcement learning. It combines a Hamilton-Jacobi reachability-based safety critic, trained by a max-backup Bellman recursion, with a one-step flow policy distilled from a flow-matching behavior model. This removes the need for rejection sampling at deployment while achieving near-zero constraint violations, matching or exceeding the reward of prior safe generative baselines (FISOR, SafeIFQL) at roughly 2.5x lower inference latency.",
+    "author": [
+      { "@type": "Person", "name": "Mumuksh Tayal", "url": "https://mumukshtayal.github.io/" },
+      { "@type": "Person", "name": "Manan Tayal", "url": "https://tayalmanan28.github.io/" },
+      { "@type": "Person", "name": "Ravi Prakash", "url": "https://ravipr009.github.io/" }
+    ],
+    "affiliation": { "@type": "CollegeOrUniversity", "name": "Indian Institute of Science (IISc)" },
+    "datePublished": "2026",
+    "isPartOf": {
+      "@type": "PublicationVolume",
+      "name": "Reinforcement Learning Journal",
+      "volumeNumber": "7"
+    },
+    "publisher": { "@type": "Organization", "name": "Reinforcement Learning Journal" },
+    "about": [
+      "Safe reinforcement learning",
+      "Offline reinforcement learning",
+      "Hamilton-Jacobi reachability",
+      "Flow matching",
+      "Constrained reinforcement learning",
+      "Safe control"
+    ],
+    "keywords": "safe reinforcement learning, offline safe RL, Hamilton-Jacobi reachability, flow matching, flow policy, safety value function, safe control",
+    "url": "https://tayalmanan28.github.io/safe-fql/",
+    "sameAs": [
+      "https://arxiv.org/abs/2603.15136",
+      "https://openreview.net/forum?id=TMfub7apzD",
+      "https://github.com/tayalmanan28/safe-fql",
+      "https://rlj.cs.umass.edu/2026/papers/Paper82.html"
+    ],
+    "citation": "Tayal, M., Tayal, M., & Prakash, R. (2026). Safe Flow Q-Learning: Offline Safe Reinforcement Learning with Reachability-Based Flow Policies. Reinforcement Learning Journal, 7."
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "SafeFQL",
+    "description": "Official implementation of Safe Flow Q-Learning (SafeFQL), a state-of-the-art offline safe reinforcement learning method pairing a Hamilton-Jacobi reachability-based safety critic with a distilled one-step flow policy.",
+    "codeRepository": "https://github.com/tayalmanan28/safe-fql",
+    "programmingLanguage": "Python",
+    "runtimePlatform": "JAX",
+    "author": [
+      { "@type": "Person", "name": "Mumuksh Tayal" },
+      { "@type": "Person", "name": "Manan Tayal" },
+      { "@type": "Person", "name": "Ravi Prakash" }
+    ],
+    "isPartOf": { "@id": "https://tayalmanan28.github.io/safe-fql/#paper" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is SafeFQL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SafeFQL (Safe Flow Q-Learning) is a state-of-the-art algorithm for offline safe reinforcement learning. Given a fixed dataset of trajectories, it trains a policy that maximizes reward while keeping a hard, state-wise safety constraint -- never entering a defined failure region -- without any online interaction with the environment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is SafeFQL different from other safe offline RL methods?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Lagrangian / cost-budget methods (BEAR-Lag, CPQ, COptiDICE, C2IQL) only enforce safety in expectation. Safe generative policies (FISOR, SafeIFQL) enforce worst-case safety but need multi-step diffusion or flow sampling plus rejection sampling at inference. SafeFQL uses a Hamilton-Jacobi reachability-based safety critic to gate a distilled one-step flow policy, so it enforces hard, worst-case safety without rejection sampling at deployment."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Hamilton-Jacobi reachability, and why does SafeFQL use it?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Hamilton-Jacobi reachability analysis computes the worst-case future value of a safety margin along a trajectory, rather than its expected discounted sum. SafeFQL learns this offline with a max-backup Bellman recursion, giving its safety critic a directly interpretable sign for feasibility instead of a tunable Lagrange multiplier."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is SafeFQL open source?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The official implementation is available at github.com/tayalmanan28/safe-fql, along with training configs, environments, and the offline datasets used in the paper."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where was SafeFQL published?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SafeFQL appears in the Reinforcement Learning Journal (Volume 7, 2026) and was presented at the 3rd Reinforcement Learning Conference (RLC), 2026. It is also available on arXiv and OpenReview."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -215,6 +348,16 @@
   <section class="section" style="padding-top: 0;">
     <div class="paper-body">
       <h2 class="title section-title">Overview</h2>
+      <p>
+        <b>SafeFQL (Safe Flow Q-Learning)</b> is a state-of-the-art method for <b>offline safe reinforcement
+        learning</b>. It pairs a <b>Hamilton&ndash;Jacobi reachability-based safety critic</b> with a
+        distilled <b>one-step flow policy</b>, so it enforces hard, state-wise safety constraints &mdash;
+        not just an expected-cost budget &mdash; while deploying with a single forward pass and no rejection
+        sampling. Across Safe Boat Navigation and the Safety Gymnasium velocity-constrained benchmarks,
+        SafeFQL attains the lowest constraint-violation rate of any evaluated method while matching or
+        exceeding the reward of prior safe generative RL baselines such as FISOR and SafeIFQL, at roughly
+        2.5&times; lower inference latency.
+      </p>
       <div class="tldr">
         <ul>
           <li><b>Hard safety, not soft cost.</b> SafeFQL replaces expected-cost budgets with a
@@ -444,6 +587,63 @@
         loss landscape and occasionally affect training stability. Continuous masking functions or soft
         Lagrangian relaxations are a natural refinement, at the cost of reintroducing hyperparameters that need
         tuning. SafeFQL is evaluated in the offline setting and does not claim online-training safety guarantees.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ==================== -->
+  <section class="section" id="FAQ">
+    <div class="paper-body">
+      <h2 class="title section-title">Frequently Asked Questions</h2>
+
+      <h3 class="subsection-title">What is SafeFQL?</h3>
+      <p>
+        SafeFQL (Safe Flow Q-Learning) is a state-of-the-art algorithm for offline safe reinforcement
+        learning. Given a fixed dataset of trajectories, it trains a policy that maximizes reward while
+        keeping a hard, state-wise safety constraint &mdash; never entering a defined failure region &mdash;
+        without any online interaction with the environment.
+      </p>
+
+      <h3 class="subsection-title">How is SafeFQL different from other safe offline RL methods?</h3>
+      <p>
+        Prior offline safe RL splits into two families. Lagrangian / cost-budget methods (BEAR-Lag, CPQ,
+        COptiDICE, C2IQL) only enforce safety <i>in expectation</i>, which is not the same as never entering
+        the failure set. Safe generative policies (FISOR, SafeIFQL) enforce worst-case safety but need
+        multi-step diffusion or flow sampling plus rejection sampling at inference, which is expensive in a
+        real-time control loop. SafeFQL replaces both: a Hamilton&ndash;Jacobi reachability-based safety
+        critic gives a hard feasibility signal, and that signal gates a distilled one-step flow policy, so no
+        rejection sampling is needed at deployment.
+      </p>
+
+      <h3 class="subsection-title">What is Hamilton-Jacobi reachability, and why does SafeFQL use it?</h3>
+      <p>
+        Hamilton&ndash;Jacobi (HJ) reachability analysis computes the worst-case future value of a safety
+        margin along a trajectory, rather than its expected discounted sum. SafeFQL learns this quantity
+        offline with a <i>max-backup</i> Bellman recursion, so its safety critic $Q_c$ has a directly
+        interpretable sign: $Q_c < 0$ means the predicted future stays safe, $Q_c \ge 0$ predicts eventual
+        constraint violation. This gives a hard feasibility gate instead of a tunable Lagrange multiplier.
+      </p>
+
+      <h3 class="subsection-title">Is SafeFQL open source?</h3>
+      <p>
+        Yes. The official implementation, built on JAX and adapted from
+        <a href="https://github.com/seohongpark/fql">FQL</a>, is available at
+        <a href="https://github.com/tayalmanan28/safe-fql">github.com/tayalmanan28/safe-fql</a>, along with
+        training configs, environments, and the offline datasets used in the paper.
+      </p>
+
+      <h3 class="subsection-title">Where was SafeFQL published?</h3>
+      <p>
+        SafeFQL appears in the Reinforcement Learning Journal (Volume 7, 2026) and was presented at the 3rd
+        Reinforcement Learning Conference (RLC), 2026. The paper is also available on
+        <a href="https://arxiv.org/abs/2603.15136">arXiv</a> and
+        <a href="https://openreview.net/forum?id=TMfub7apzD">OpenReview</a>.
+      </p>
+
+      <h3 class="subsection-title">How do I cite SafeFQL?</h3>
+      <p>
+        Use the BibTeX entry below, or see the
+        <a href="https://github.com/tayalmanan28/safe-fql">GitHub repository</a> for an up-to-date citation.
       </p>
     </div>
   </section>

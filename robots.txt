@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tayalmanan28.github.io/safe-fql/sitemap.xml
