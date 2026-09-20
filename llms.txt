@@ -1,0 +1,48 @@
+# SafeFQL
+
+> SafeFQL (Safe Flow Q-Learning) is a state-of-the-art method for offline safe
+> reinforcement learning. It combines a Hamilton-Jacobi reachability-based
+> safety critic, trained via a max-backup Bellman recursion, with a one-step
+> flow policy distilled from a flow-matching behavior model. This enforces
+> hard, state-wise safety constraints at deployment with a single forward
+> pass and no rejection sampling.
+
+## Key facts
+
+- Full name: Safe Flow Q-Learning (SafeFQL)
+- Authors: Mumuksh Tayal, Manan Tayal (equal contribution), Ravi Prakash
+- Affiliation: Indian Institute of Science (IISc), India
+- Venue: Reinforcement Learning Conference (RLC) 2026; Reinforcement Learning
+  Journal, Volume 7, 2026
+- Problem area: offline safe reinforcement learning / safe RL / constrained RL
+- Core idea: a Hamilton-Jacobi reachability-based safety critic gates a
+  distilled one-step flow policy, replacing both expected-cost Lagrangian
+  methods and rejection-sampled safe generative policies (e.g. FISOR,
+  SafeIFQL)
+- Headline results: lowest constraint-violation rate across all evaluated
+  benchmarks (Safe Boat Navigation, Safety Gymnasium velocity-constrained
+  tasks), reward competitive with or exceeding prior safe generative
+  baselines, at roughly 2.5x lower inference latency and no rejection
+  sampling
+
+## Links
+
+- Project page: https://tayalmanan28.github.io/safe-fql/
+- Paper (PDF): https://rlj.cs.umass.edu/2026/papers/Paper82.pdf
+- arXiv: https://arxiv.org/abs/2603.15136
+- OpenReview: https://openreview.net/forum?id=TMfub7apzD
+- Code: https://github.com/tayalmanan28/safe-fql
+- Offline dataset (Point Robot / Boat Robot): https://huggingface.co/datasets/tayalmanan/SafeBoatData
+
+## Citation
+
+```
+@article{tayal2026safe,
+    title={Safe Flow Q-Learning: Offline Safe Reinforcement Learning
+           with Reachability-Based Flow Policies},
+    author={Mumuksh Tayal and Manan Tayal and Ravi Prakash},
+    journal={Reinforcement Learning Journal},
+    volume={7},
+    year={2026}
+}
+```
